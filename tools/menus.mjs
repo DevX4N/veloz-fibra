@@ -1,0 +1,22 @@
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+const puppeteer = require("C:/Estudo/Claude/ink-studio/node_modules/puppeteer-core");
+const b = await puppeteer.launch({ executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe", headless: "new" });
+const p = await b.newPage();
+await p.evaluateOnNewDocument(() => localStorage.setItem("vf:consent", JSON.stringify({ essential: true, analytics: false, marketing: false, decidedAt: "x" })));
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+await p.setViewport({ width: 1440, height: 900 });
+await p.goto("http://localhost:3016/", { waitUntil: "networkidle0" });
+await p.hover(".main-nav__item:nth-child(3) .main-nav__trigger"); await wait(500);
+await p.screenshot({ path: ".shots/menu-desktop.png", clip: { x: 0, y: 0, width: 1440, height: 520 } });
+await p.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true });
+await p.goto("http://localhost:3016/", { waitUntil: "networkidle0" });
+await p.click(".burger"); await wait(500);
+await p.evaluate(() => [...document.querySelectorAll(".drawer__trigger")][2].click()); await wait(500);
+await p.screenshot({ path: ".shots/menu-mobile.png" });
+// cookie banner (sem consentimento)
+const p2 = await b.newPage();
+await p2.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true });
+await p2.goto("http://localhost:3016/planos", { waitUntil: "networkidle0" }); await wait(1500);
+await p2.screenshot({ path: ".shots/cookie-mobile.png" });
+await b.close();
